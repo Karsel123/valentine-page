@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Will You Be My Valentine?</title>
+  <style>
+    /* Basic page styling */
+    body {
+      background: #ffe6e6;
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+    }
+    /* The main container covers the whole viewport and centers its content */
+    #container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    /* Container for the teddy (and the heart overlay) */
+    #teddyContainer {
+      position: relative;
+      margin-bottom: 30px;
+    }
+    /* The teddy div initially “hides” half the image (simulate half-face) */
+    #teddy {
+      width: 150px;  /* only half of the full 300px image is visible initially */
+      overflow: hidden;
+      transition: width 1s ease-in-out;
+    }
+    /* After the delay, add the "open" class to reveal the full teddy image */
+    #teddy.open {
+      width: 300px;
+    }
+    #teddy img {
+      width: 100%;
+      display: block;
+    }
+    /* Heart shape (an inline SVG) – initially hidden */
+    #heart {
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    /* Jump animation for the teddy */
+    @keyframes jump {
+      0% { transform: translateY(0); }
+      30% { transform: translateY(-50px); }
+      50% { transform: translateY(0); }
+      70% { transform: translateY(-20px); }
+      100% { transform: translateY(0); }
+    }
+    .jump {
+      animation: jump 0.6s ease;
+    }
+    /* Heart appearance animation */
+    @keyframes heartAppear {
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+      }
+      50% { opacity: 1; }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+    }
+    .showHeart {
+      animation: heartAppear 1s forwards;
+    }
+    /* Prompt container for the question and buttons */
+    #promptContainer {
+      text-align: center;
+    }
+    #promptContainer h2 {
+      margin: 0 0 20px;
+      font-size: 24px;
+    }
+    /* Container for the buttons to have them appear on the same “label” */
+    #buttonContainer {
+      display: inline-block;
+      position: relative;
+    }
+    /* Basic styling for both buttons */
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      margin: 0 10px;
+    }
+    /* Style for the Yes button */
+    #yesButton {
+      background-color: #ffcccc;
+    }
+    /* Initially, the No button flows inline so that both appear together.
+       Later, we’ll change its positioning on hover/click. */
+    #noButton {
+      background-color: #ffe0e0;
+    }
+    /* "Yay" message styling */
+    #yayMessage {
+      display: none;
+      font-size: 36px;
+      color: #ff6699;
+      text-align: center;
+      margin-top: 20px;
+      animation: fadeIn 1s forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <!-- Teddy container with image and heart overlay -->
+    <div id="teddyContainer">
+      <div id="teddy">
+        <!-- Replace with your own teddy image if desired.
+             This placeholder image is 300px wide. -->
+        <img src="teddy.png" alt="Teddy Bear">
+      </div>
+    </div>
+    
+    <!-- Prompt container with the question and both buttons together -->
+    <div id="promptContainer">
+      <h2>Will you be my Valentine?</h2>
+      <div id="buttonContainer">
+        <button id="yesButton">Yes</button>
+        <button id="noButton">No</button>
+      </div>
+    </div>
+
+    <!-- "Yay" message, initially hidden -->
+    <div id="yayMessage">
+      yayyyy!!!
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const teddy         = document.getElementById("teddy");
+      const yesButton     = document.getElementById("yesButton");
+      const noButton      = document.getElementById("noButton");
+      const heart         = document.getElementById("heart");
+      const teddyImg      = document.querySelector("#teddy img");
+      const promptContainer = document.getElementById("promptContainer");
+      const yayMessage      = document.getElementById("yayMessage");
+
+      // After a short delay, reveal the full teddy image.
+      setTimeout(function() {
+        teddy.classList.add("open");
+      }, 500);
+
+      // Function to reposition the No button to a random spot within the viewport.
+      function repositionNoButton() {
+        // Change the No button's position to fixed so we can move it anywhere.
+        noButton.style.position = "fixed";
+        const buttonWidth  = noButton.offsetWidth;
+        const buttonHeight = noButton.offsetHeight;
+        const maxLeft = window.innerWidth - buttonWidth;
+        const maxTop  = window.innerHeight - buttonHeight;
+        const randomLeft = Math.random() * maxLeft;
+        const randomTop  = Math.random() * maxTop;
+        noButton.style.left = randomLeft + "px";
+        noButton.style.top  = randomTop + "px";
+      }
+
+      // When the user hovers over or clicks the No button, move it.
+      noButton.addEventListener("mouseenter", repositionNoButton);
+      noButton.addEventListener("click", function(e) {
+        e.preventDefault();
+        repositionNoButton();
+      });
+
+      // When the user clicks the Yes button:
+      // 1. Make the teddy jump.
+      // 2. Change the teddy image (e.g. to a "happy" teddy).
+      // 3. Animate the heart to appear.
+      // 4. Hide the prompt (question and buttons) and show the "yayyyy!!!" message.
+      yesButton.addEventListener("click", function() {
+        teddy.classList.add("jump");
+        // Change the teddy image – replace the URL with your own if desired.
+        teddyImg.src = "bear-love.gif";
+        // Hide the question and buttons.
+        promptContainer.style.display = "none";
+        // Show the "yayyyy!!!" message.
+        yayMessage.style.display = "block";
+        // Remove the jump class after the animation ends to allow re-triggering if needed.
+        teddy.addEventListener("animationend", function() {
+          teddy.classList.remove("jump");
+        }, { once: true });
+      });
+    });
+  </script>
+</body>
+</html>
